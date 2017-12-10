@@ -7,7 +7,7 @@ NECTATZScrapper is a python script written for the Tanzania necta results pages 
 
 ### Clone the repository
 ```shell
-git clonegit@github.com:CodeForTanzania/NECTATZScrapper.git
+git clone git@github.com:CodeForTanzania/NECTATZScrapper.git
 ```
 
 ### Install Packages
