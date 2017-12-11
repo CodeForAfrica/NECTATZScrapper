@@ -1,11 +1,15 @@
 #import preprocessing
+acseeYear2014 = {}
+acseeYear2015 = {}
 
+cseeyear2015 = {
+	'name': 'cseeYear2015',
+	'schoolPath': 'http://www.necta.go.tz/results/2015/csee/',
+	'resultUrl': 'http://www.necta.go.tz/results/2015/csee/csee.htm'
+	}
 
-year2014 = {}
-year2015 = {}
-year2016 = {}
 cseeYear2016 = {
-	'name': 'cseeYear2017',
+	'name': 'cseeYear2016',
 	'schoolPath': 'http://www.necta.go.tz/results/2016/csee/',
 	'resultUrl': 'http://www.necta.go.tz/results/2016/csee/index.htm'
-}
+	}
