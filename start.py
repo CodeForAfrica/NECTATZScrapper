@@ -8,14 +8,14 @@ import requests
 try:
 
 	#get the result pahe
-	resultPage = requests.get(config.cseeYear2016['resultUrl'], allow_redirects = False)
+	resultPage = requests.get(config.acseeYear2017['resultUrl'], allow_redirects = False)
 
 	#tree contains the whole html
 	tree = html.fromstring(resultPage.content)
 
 
 	#csv File
-	csvFileName = config.cseeYear2016['name'] +"Result.csv"
+	csvFileName = config.acseeYear2017['name'] +"Result.csv"
 	csv = open(csvFileName, "w")
 	colNames = "SCHOOL CODE, SCHOOL NAME, REGION, GPA, SUBJECT_CODE, SUBJECT_NAME, SUBJECT_GPA, SUBJECT_REG_RANK, SUBJECT_NAT_RANK \n"
 	csv.write(colNames)
@@ -47,7 +47,7 @@ try:
 			school_uri = schoolsUri[i].replace("\\","/")
 
 			#Get school specific html content
-			schoolResult = requests.get(config.cseeYear2016['schoolPath'] + school_uri, allow_redirects = False)
+			schoolResult = requests.get(config.acseeYear2017['schoolPath'] + school_uri, allow_redirects = False)
 			schoolTree = html.fromstring(schoolResult.content)
 
 			result = schoolTree.xpath('//table[@cellspacing="0"]')
