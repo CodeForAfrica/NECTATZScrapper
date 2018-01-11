@@ -19,7 +19,7 @@ acseeYear2017 = {
 	'schoolPath': 'http://www.necta.go.tz/results/2017/acsee/',
 	'resultUrl': 'http://www.necta.go.tz/results/2017/acsee/index.htm'
 	}
-cseeyear2015 = {
+cseeYear2015 = {
 	'name': 'cseeYear2015',
 	'schoolPath': 'http://www.necta.go.tz/results/2015/csee/',
 	'resultUrl': 'http://www.necta.go.tz/results/2015/csee/csee.htm'
