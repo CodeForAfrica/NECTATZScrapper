@@ -8,7 +8,7 @@ import requests
 import MySQLdb
 
 try:
-	page = requests.get(config.cseeYear2015['resultUrl'], allow_redirects = False)
+	page = requests.get(config.cseeYear2016['resultUrl'], allow_redirects = False)
 	#tree contains the whole html
 
 	tree = html.fromstring(page.content)
@@ -19,15 +19,24 @@ try:
 
 	#connect to db
 	dbConnection =MySQLdb.connect(host='localhost',user='root',passwd='khadija',db='careertoolDB')
-	dbCursor = dbConnection.cursor();
-	query = "CREATE TABLE " + config.cseeYear2016 + " (SchoolCode VARCHAR(20) NOT NULL, SchoolName VARCHAR(50) NOT NULL, Region VARCHAR(30) NOT NULL, StudentNo VARCHAR(20) NOT NULL, Gender CHAR(1) NOT NULL, Division VARCHAR(5), Civics CHAR(1), History CHAR(1), English CHAR(1), Kiswahili CHAR(1), Geography CHAR(1), BibleKnowledge CHAR(1), BasicMathematics CHAR(1), AdditionalMathematics CHAR(1), Biology CHAR(1), Physics CHAR(1), Chemistry CHAR(1), BookKeeping CHAR(1), Commerce CHAR(1), AgriculturalSci CHAR(1), ElectricalDraugting CHAR(1), ElectricalInstallation CHAR(1), ElectricalEngnSci CHAR(1), ElimuYaDiniKiislam CHAR(1), FineArt CHAR(1), ArabicLanguage CHAR(1), ArchtecturualDraught CHAR(1), BrickworkMasonary CHAR(1), BuildingConstruction CHAR(1), CarpentryJoinery CHAR(1), EngineeringSci CHAR(1), FittingTurning CHAR(1), FoodNutrition CHAR(1), FrenchLanguage CHAR(1), ComputerStudies CHAR(1), Plumbing CHAR(1), Music CHAR(1), LiteratureEnglish CHAR(1), MechanicalDraughting CHAR(1), MotorVehicleMech CHAR(1), PaintingSignWriting CHAR(1), PhysicalEducation CHAR(1), RadioTvServing CHAR(1), Surveying CHAR(1), TextileDressMaking CHAR(1), TheatreArt CHAR(1), WeldingMetalFabrication CHAR(1), WorkshopTech CHAR(1))"
+	dbCursor = dbConnection.cursor()
+
+	#drop if table exists
+	dropQuery = "DROP TABLE IF EXISTS " + config.cseeYear2016['name']
+	try:
+		dbCursor.execute(dropQuery)
+		dbConnection.commit()
+	except:
+		print "Table does not exist"
+
+	query = "CREATE TABLE " + config.cseeYear2016['name'] + " (SchoolCode CHAR(20) NOT NULL, SchoolName CHAR(50) NOT NULL, Region CHAR(30) NOT NULL, StudentNo CHAR(20) NOT NULL, Gender CHAR(5) NOT NULL, Division CHAR(5), Civics CHAR(5), History CHAR(5), English CHAR(5), Kiswahili CHAR(5), Geography CHAR(5), BibleKnowledge CHAR(5), BasicMathematics CHAR(5), AdditionalMathematics CHAR(5), Biology CHAR(5), Physics CHAR(5), Chemistry CHAR(5), BookKeeping CHAR(5), Commerce CHAR(5), AgriculturalSci CHAR(5), ElectricalDraugting CHAR(5), ElectricalInstallation CHAR(5), ElectricalEngnSci CHAR(5), ElimuYaDiniKiislam CHAR(5), FineArt CHAR(5), ArabicLanguage CHAR(5), ArchtecturualDraught CHAR(5), BrickworkMasonary CHAR(5), BuildingConstruction CHAR(5), CarpentryJoinery CHAR(5), EngineeringSci CHAR(5), FittingTurning CHAR(5), FoodNutrition CHAR(5), FrenchLanguage CHAR(5), ComputerStudies CHAR(5), Plumbing CHAR(5), Music CHAR(5), LiteratureEnglish CHAR(5), MechanicalDraughting CHAR(5), MotorVehicleMech CHAR(5), PaintingSignWriting CHAR(5), PhysicalEducation CHAR(5), RadioTvServing CHAR(5), Surveying CHAR(5), TextileDressMaking CHAR(5), TheatreArt CHAR(5), WeldingMetalFabrication CHAR(5), WorkshopTech CHAR(5))"
 	
 	try:
 		dbCursor.execute(query)
-		dbCursor.commit()
+		dbConnection.commit()
 	except:
-		dbCursor.callback()
-
+		dbConnection.callback()
+		print "Unexpected error:", sys.exc_info()
 
 	for i in range (0, total):
 		school = schools[i].strip()
@@ -42,19 +51,20 @@ try:
 			#School Url
 			school_uri = schoolsUri[i].replace("\\","/")
 			#Get school specific html content
-			schoolResult = requests.get(config.cseeYear2015['schoolPath'] + school_uri, allow_redirects = False)
+			schoolResult = requests.get(config.cseeYear2016['schoolPath'] + school_uri, allow_redirects = False)
 			schoolTree = html.fromstring(schoolResult.content)
-			
 			result = schoolTree.xpath('//table[@cellspacing="0"]')
 			if len(result) > 1:
-				region = result[1].text_content().split('\n')[1];
+				region = (result[1].text_content().split('\n')[1]).strip();
 			else:
 				region = "Not Defined"
 
 			resultTdElem = schoolTree.xpath('//table[@cellspacing="2"]//td')
 			resultTdElemLength = len(resultTdElem)
 
-			insertQuery = "INSERT INTO " + config.cseeYear2016 + "(Civics, History, English, Kiswahili, Geography, BibleKnowledge, BasicMathematics, AdditionalMathematics, Biology, Physics, Chemistry, BookKeeping, Commerce, AgriculturalSc, ElectricalDraugt, ElectricalInstal, ElectricalEngnSc, ElimuYaDiniKiislam, FineArt, ArabicLang, ArchtecturualDrought, BrickworkMasonary, BuildingConstruction, CarpentryJoinery, EngineeringSci, FittingTurning, FoodNutrition, FrenchLang, InformComputer, Plumbing, Music, LiteratureEng, MechanicalDrought, MotorVehicleMech, PaintingSignWriting, PhysicalEducation, RadioTvServing, Serving, TextileDressMaking, TheatreArt, WeldingMetalFabrication, WorkshopTech) VALUES"
+			insertQuery = "INSERT INTO " + config.cseeYear2016['name'] + " (SchoolCode, SchoolName, Region, StudentNo, Gender, Division, Civics, History, English, Kiswahili, Geography, BibleKnowledge, BasicMathematics, AdditionalMathematics, Biology, Physics, Chemistry, BookKeeping, Commerce, AgriculturalSci, ElectricalDraugting, ElectricalInstallation, ElectricalEngnSci, ElimuYaDiniKiislam, FineArt, ArabicLanguage, ArchtecturualDraught, BrickworkMasonary, BuildingConstruction, CarpentryJoinery, EngineeringSci, FittingTurning, FoodNutrition, FrenchLanguage, ComputerStudies, Plumbing, Music, LiteratureEnglish, MechanicalDraughting, MotorVehicleMech, PaintingSignWriting, PhysicalEducation, RadioTvServing, Surveying, TextileDressMaking, TheatreArt, WeldingMetalFabrication, WorkshopTech) VALUES(%s, %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+			
+			valueArray = []
 
 			if resultTdElemLength > 0:
 				for x in range (5, resultTdElemLength, 5):
@@ -63,148 +73,147 @@ try:
 					division = resultTdElem[x+3].text_content().strip()
 					subjects = resultTdElem[x+4].text_content().strip()
 
-					Civics = History = English = Kiswahili = Geography = BibleKnowledge = BasicMathematics = AdditionalMathematics = Biology = Physics = Chemistry = BookKeeping = Commerce = AgriculturalSci = ElectricalDraugting = ElectricalInstallation = ElectricalEngnSci = ElimuYaDiniKiislam = FineArt = ArabicLanguage = ArchtecturualDraught = BrickworkMasonary = BuildingConstruction = CarpentryJoinery = EngineeringSci = FittingTurning = FoodNutrition = FrenchLanguage = ComputerStudies = Plumbing = Music = LiteratureEnglish = MechanicalDraughting = MotorVehicleMech = PaintingSignWriting = PhysicalEducation = RadioTvServing = Surveying = TextileDressMaking = TheatreArt = WeldingMetalFabrication = WorkshopTech = None
+					Civics = History = English = Kiswahili = Geography = BibleKnowledge = BasicMathematics = AdditionalMathematics = Biology = Physics = Chemistry = BookKeeping = Commerce = AgriculturalSci = ElectricalDraugting = ElectricalInstallation = ElectricalEngnSci = ElimuYaDiniKiislam = FineArt = ArabicLanguage = ArchtecturualDraught = BrickworkMasonary = BuildingConstruction = CarpentryJoinery = EngineeringSci = FittingTurning = FoodNutrition = FrenchLanguage = ComputerStudies = Plumbing = Music = LiteratureEnglish = MechanicalDraughting = MotorVehicleMech = PaintingSignWriting = PhysicalEducation = RadioTvServing = Surveying = TextileDressMaking = TheatreArt = WeldingMetalFabrication = WorkshopTech = "NULL"
 					
 					if "CIV - '" in subjects:
 						index = subjects.find("CIV - '")
-						Civics = subjects[index+1]
-					elif "GEO - '" in subjects:
+						Civics = subjects[index+7]
+					if "GEO - '" in subjects:
 						index = subjects.find("GEO - '")
-						Geography = subjects[index+1] 
-					elif "B/MATH - '" in subjects:
+						Geography = subjects[index+7] 
+					if "B/MATH - '" in subjects:
 						index = subjects.find("B/MATH - '")
-						BasicMathematics = subjects[index+1]
-					elif "HIST - '" in subjects:
+						BasicMathematics = subjects[index+10]
+					if "HIST - '" in subjects:
 						index = subjects.find("HIST - '")
-						History = subjects[index+1]
-					elif "ENGL - '" in subjects:
+						History = subjects[index+8]
+					if "ENGL - '" in subjects:
 						index = subjects.find("ENGL - '")
-						English = subjects[index+1]
-					elif "KISW - '" in subjects:
+						English = subjects[index+8]
+					if "KISW - '" in subjects:
 						index = subjects.find("KISW - '")
-						Kiswahili = subjects[index+1]
-					elif "E/D/KIISLAMU - '" in subjects:
+						Kiswahili = subjects[index+8]
+					if "E/D/KIISLAMU - '" in subjects:
 						index = subjects.find("E/D/KIISLAMU - '")
-						ElimuYaDiniKiislam = subjects[index+1]
-					elif "B/KNOWL - '" in subjects:
+						ElimuYaDiniKiislam = subjects[index+16]
+					if "B/KNOWL - '" in subjects:
 						index = subjects.find("B/KNOWL - '")
-						BibleKnowledge = subjects[index+1]
-					elif "PHY - '" in subjects:
+						BibleKnowledge = subjects[index+11]
+					if "PHY - '" in subjects:
 						index = subjects.find("PHY - '")
-						Physics = subjects[index+1]
-					elif "CHEM - '" in subjects:
+						Physics = subjects[index+7]
+					if "CHEM - '" in subjects:
 						index = subjects.find("CHEM - '")
-						Chemistry = subjects[index+1]
-					elif "ARABIC LANGUAGE - '" in subjects:
+						Chemistry = subjects[index+8]
+					if "ARABIC LANGUAGE - '" in subjects:
 						index = subjects.find("ARABIC LANGUAGE - '")
-						ArabicLanguage = subjects[index+1]
-					elif "BIO'" in subjects:
+						ArabicLanguage = subjects[index+19]
+					if "BIO'" in subjects:
 						index = subjects.find("BIO - '")
-						Biology = subjects[index+1]
-					elif "COMP STUD - '" in subjects:
+						Biology = subjects[index+7]
+					if "COMP STUD - '" in subjects:
 						index = subjects.find("COMP STUD - '")
-						ComputerStudies = subjects[index+1]
-					elif "B/KEEPING - '" in subjects:
+						ComputerStudies = subjects[index+13]
+					if "B/KEEPING - '" in subjects:
 						index = subjects.find("B/KEEPING - '")
-						BookKeeping = subjects[index+1]
-					elif "COMM - '" in subjects:
+						BookKeeping = subjects[index+13]
+					if "COMM - '" in subjects:
 						index = subjects.find("COMM - '")
-						Commerce = subjects[index+1]
-					elif "AGRI - '" in subjects:
+						Commerce = subjects[index+8]
+					if "AGRI - '" in subjects:
 						index = subjects.find("AGRI - '")
-						AgriculturalSci = subjects[index+1]
-					elif "ADD MATH - '" in subjects:
+						AgriculturalSci = subjects[index+8]
+					if "ADD MATH - '" in subjects:
 						index = subjects.find("ADD MATH - '")
-						AdditionalMathematics = subjects[index+1]
-					elif "ELECT DRAUGHT - '" in subjects:
+						AdditionalMathematics = subjects[index+12]
+					if "ELECT DRAUGHT - '" in subjects:
 						index = subjects.find("ELECT DRAUGHT - '")
-						ElectricalDraugting = subjects[index+1]
-					elif "MECH DRAUGHT - '" in subjects:
+						ElectricalDraugting = subjects[index+17]
+					if "MECH DRAUGHT - '" in subjects:
 						index = subjects.find("MECH DRAUGHT - '")
-						MechanicalDraughting = subjects[index+1]
-					elif "W/SHOP TECH - '" in subjects:
+						MechanicalDraughting = subjects[index+16]
+					if "W/SHOP TECH - '" in subjects:
 						index = subjects.find("W/SHOP TECH - '")
-						WorkshopTech = subjects[index+1]
-					elif "FITT & TURN - '" in subjects:
+						WorkshopTech = subjects[index+15]
+					if "FITT & TURN - '" in subjects:
 						index = subjects.find("FITT & TURN - '")
-						FittingTurning = subjects[index+1]
-					elif "ELECT INST - '" in subjects:
+						FittingTurning = subjects[index+15]
+					if "ELECT INST - '" in subjects:
 						index = subjects.find("ELECT INST - '")
-						ElectricalInstallation = subjects[index+1]
-					elif "RADIO & TV - '" in subjects:
+						ElectricalInstallation = subjects[index+14]
+					if "RADIO & TV - '" in subjects:
 						index = subjects.find("RADIO & TV - '")
-						RadioTvServing = subjects[index+1]
-					elif "ELECT ENG SC - '" in subjects:
+						RadioTvServing = subjects[index+14]
+					if "ELECT ENG SC - '" in subjects:
 						index = subjects.find("ELECT ENG SC - '")
-						ElectricalEngnSci = subjects[index+1]
-					elif "MOT VEH MECH - '" in subjects:
+						ElectricalEngnSci = subjects[index+16]
+					if "MOT VEH MECH - '" in subjects:
 						index = subjects.find("MOT VEH MECH - '")
-						MotorVehicleMech = subjects[index+1]
-					elif "BLD CONSTR - '" in subjects:
+						MotorVehicleMech = subjects[index+16]
+					if "BLD CONSTR - '" in subjects:
 						index = subjects.find("BLD CONSTR - '")
-						BuildingConstruction = subjects[index+1]
-					elif "ARCH DRAUGHT - '" in subjects:
+						BuildingConstruction = subjects[index+14]
+					if "ARCH DRAUGHT - '" in subjects:
 						index = subjects.find("ARCH DRAUGHT - '")
-						ArchtecturualDraught = subjects[index+1]
-					elif "WELD & MET - '" in subjects:
+						ArchtecturualDraught = subjects[index+16]
+					if "WELD & MET - '" in subjects:
 						index = subjects.find("WELD & MET - '")
-						WeldingMetalFabrication = subjects[index+1]
-					elif "PLUMBING - '" in subjects:
+						WeldingMetalFabrication = subjects[index+14]
+					if "PLUMBING - '" in subjects:
 						index = subjects.find("PLUMBING - '")
-						Plumbing = subjects[index+1]
-					elif "BRI & MAS - '" in subjects:
+						Plumbing = subjects[index+12]
+					if "BRI & MAS - '" in subjects:
 						index = subjects.find("BRI & MAS - '")
-						BrickworkMasonary = subjects[index+1]
-					elif "ENG SC - '" in subjects:
+						BrickworkMasonary = subjects[index+13]
+					if "ENG SC - '" in subjects:
 						index = subjects.find("ENG SC - '")
-						EngineeringSci = subjects[index+1]
-					elif "CARP & JOIN - '" in subjects:
+						EngineeringSci = subjects[index+10]
+					if "CARP & JOIN - '" in subjects:
 						index = subjects.find("CARP & JOIN - '")
-						CarpentryJoinery = subjects[index+1]
-					elif "TEXTILE - '" in subjects:
+						CarpentryJoinery = subjects[index+15]
+					if "TEXTILE - '" in subjects:
 						index = subjects.find("TEXTILE - '")
-						TextileDressMaking = subjects[index+1]
-					elif "PAINT & SIGN - '" in subjects:
+						TextileDressMaking = subjects[index+11]
+					if "PAINT & SIGN - '" in subjects:
 						index = subjects.find("PAINT & SIGN - '")
-						PaintingSignWriting = subjects[index+1]
-					elif "PHY EDU - '" in subjects:
+						PaintingSignWriting = subjects[index+16]
+					if "PHY EDU - '" in subjects:
 						index = subjects.find("PHY EDU - '")
-						PhysicalEducatio = subjects[index+1]
-					elif "FREN - '" in subjects:
+						PhysicalEducatio = subjects[index+11]
+					if "FREN - '" in subjects:
 						index = subjects.find("FREN - '")
-						FrenchLanguage = subjects[index+1]
-					elif "F.ART - '" in subjects:
+						FrenchLanguage = subjects[index+8]
+					if "F.ART - '" in subjects:
 						index = subjects.find("F.ART - '")
-						FineArt = subjects[index+1]
-					elif "FOOD - '" in subjects:
+						FineArt = subjects[index+9]
+					if "FOOD - '" in subjects:
 						index = subjects.find("FOOD - '")
-						FoodNutrition = subjects[index+1]
-					elif "LIT ENG - '" in subjects:
+						FoodNutrition = subjects[index+8]
+					if "LIT ENG - '" in subjects:
 						index = subjects.find("LIT ENG - '")
-						LiteratureEnglish = subjects[index+1]
-					elif "SURVEYING - '" in subjects:
+						LiteratureEnglish = subjects[index+11]
+					if "SURVEYING - '" in subjects:
 						index = subjects.find("SURVEYING - '")
-						Surveying = subjects[index+1]
-					elif "MUSIC - '" in subjects:
+						Surveying = subjects[index+13]
+					if "MUSIC - '" in subjects:
 						index = subjects.find("MUSIC - '")
-						Music = subjects[index+1]
-					elif "THEATRE ART - '" in subjects:
+						Music = subjects[index+9]
+					if "THEATRE ART - '" in subjects:
 						index = subjects.find("THEATRE ART - '")
-						TheatreArt = subjects[index+1]
- 
-
-					insertQuery += "("+Civics+","+History+","+English+","+Kiswahili+","+Geography+","+BibleKnowledge+","+BasicMathematics+","+AdditionalMathematics+","+Biology+","+Physics+","+Chemistry+","+BookKeeping+","+Commerce+","+AgriculturalSc+","+ElectricalDraugt+","+ElectricalInstal+","+ElectricalEngnSc+","+ElimuYaDiniKiislam+","+FineArt+","+ArabicLang+","+ArchtecturualDrought+","+BrickworkMasonary+","+BuildingConstruction+","+CarpentryJoinery+","+EngineeringSci+","+FittingTurning+","+FoodNutrition+","+FrenchLang+","+InformComputer+","+Plumbing+","+Music+","+LiteratureEng+","+MechanicalDrought+","+MotorVehicleMech+","+PaintingSignWriting+","+PhysicalEducation+","+RadioTvServing+","+Serving+","+TextileDressMaking+","+TheatreArt+","+WeldingMetalFabrication+","+WorkshopTech+")"
-					if (x != resultTdElemLength-1):
-						insertQuery += ","
+						TheatreArt = subjects[index+15]
+					valueTuple = (school_code, school_name, region, student_no, gender, division,  Civics,  History ,  English , Kiswahili, Geography, BibleKnowledge, BasicMathematics, AdditionalMathematics, Biology, Physics, Chemistry, BookKeeping, Commerce, AgriculturalSci, ElectricalDraugting, ElectricalInstallation, ElectricalEngnSci, ElimuYaDiniKiislam, FineArt, ArabicLanguage, ArchtecturualDraught, BrickworkMasonary ,  BuildingConstruction , CarpentryJoinery, EngineeringSci, FittingTurning, FoodNutrition, FrenchLanguage, ComputerStudies,  Plumbing, Music, LiteratureEnglish, MechanicalDraughting, MotorVehicleMech, PaintingSignWriting, PhysicalEducation, RadioTvServing, Surveying, TextileDressMaking, TheatreArt, WeldingMetalFabrication, WorkshopTech)
+					valueArray.append(valueTuple)
 					
-			dbCursor.execute(insertQuery)
+			dbCursor.executemany(insertQuery, valueArray)
+			dbConnection.commit()
 			print "Done Scrapping: School Name " + str(school_name)
             		print "------------------------------------------------------------------------"
+	dbConnection.close()
 
 
 
 except:
-	print "Unexpected error:", sys.exc_info()[0]
+	print "Unexpected error:", sys.exc_info()
 	print "Oops, something went wrong"
 
 
